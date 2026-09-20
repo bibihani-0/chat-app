@@ -2,6 +2,8 @@ import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import TicTacToeBoard from "./tic-tac-toe-board";
 import RPSBoard from "./rps-board";
+import ConnectFourBoard from "./connect-four-board";
+import MemoryBoard from "./memory-board";
 
 export default async function GameRoomPage({
   params,
@@ -65,11 +67,22 @@ export default async function GameRoomPage({
           />
         )}
 
-        {(room.game_type === "connect-four" || room.game_type === "memory") && (
-          <div style={{ textAlign: "center" }}>
-            <h1>{room.game_type}</h1>
-            <p style={{ color: "#94a3b8" }}>This game is coming in the next phase!</p>
-          </div>
+        {room.game_type === "connect-four" && (
+          <ConnectFourBoard
+            initialRoom={room}
+            currentUserId={user.id}
+            playerAUsername={playerAUsername}
+            playerBUsername={playerBUsername}
+          />
+        )}
+
+        {room.game_type === "memory" && (
+          <MemoryBoard
+            initialRoom={room}
+            currentUserId={user.id}
+            playerAUsername={playerAUsername}
+            playerBUsername={playerBUsername}
+          />
         )}
       </div>
     </main>
