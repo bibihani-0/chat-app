@@ -1,5 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import TicTacToeBoard from "./tic-tac-toe-board";
+import RPSBoard from "./rps-board";
 
 export default async function GameRoomPage({
   params,
@@ -19,7 +21,7 @@ export default async function GameRoomPage({
 
   const { data: room } = await supabase
     .from("game_rooms")
-    .select("id, game_type, player_a, player_b, status")
+    .select("*")
     .eq("id", roomId)
     .single();
 
@@ -32,12 +34,44 @@ export default async function GameRoomPage({
     redirect("/dashboard");
   }
 
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, username")
+    .in("id", [room.player_a, room.player_b]);
+
+  const playerAUsername = profiles?.find((p) => p.id === room.player_a)?.username || "Player A";
+  const playerBUsername = profiles?.find((p) => p.id === room.player_b)?.username || "Player B";
+
   return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif", textAlign: "center" }}>
+    <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <a href="/dashboard" style={{ color: "#94a3b8" }}>← Back to Dashboard</a>
-      <h1 style={{ marginTop: "24px" }}>{room.game_type}</h1>
-      <p style={{ color: "#94a3b8" }}>Room ID: {room.id}</p>
-      <p style={{ color: "#4ade80" }}>Room created ✅ — game board coming in the next phase!</p>
+
+      <div style={{ marginTop: "24px" }}>
+        {room.game_type === "tic-tac-toe" && (
+          <TicTacToeBoard
+            initialRoom={room}
+            currentUserId={user.id}
+            playerAUsername={playerAUsername}
+            playerBUsername={playerBUsername}
+          />
+        )}
+
+        {room.game_type === "rock-paper-scissors" && (
+          <RPSBoard
+            initialRoom={room}
+            currentUserId={user.id}
+            playerAUsername={playerAUsername}
+            playerBUsername={playerBUsername}
+          />
+        )}
+
+        {(room.game_type === "connect-four" || room.game_type === "memory") && (
+          <div style={{ textAlign: "center" }}>
+            <h1>{room.game_type}</h1>
+            <p style={{ color: "#94a3b8" }}>This game is coming in the next phase!</p>
+          </div>
+        )}
+      </div>
     </main>
   );
 }
