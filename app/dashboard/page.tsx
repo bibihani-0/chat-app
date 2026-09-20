@@ -24,6 +24,31 @@ export default async function DashboardPage() {
     .from("profiles")
     .select("*", { count: "exact", head: true });
 
+  const { data: conversations } = await supabase
+    .from("conversations")
+    .select("id, participant_a, participant_b")
+    .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
+    .order("updated_at", { ascending: false });
+
+  let recentChats: { id: string; username: string }[] = [];
+
+  if (conversations && conversations.length > 0) {
+    const otherIds = conversations.map((c) =>
+      c.participant_a === user.id ? c.participant_b : c.participant_a
+    );
+
+    const { data: otherProfiles } = await supabase
+      .from("profiles")
+      .select("id, username")
+      .in("id", otherIds);
+
+    recentChats = conversations.map((c) => {
+      const otherId = c.participant_a === user.id ? c.participant_b : c.participant_a;
+      const otherProfile = otherProfiles?.find((p) => p.id === otherId);
+      return { id: c.id, username: otherProfile?.username || "Unknown" };
+    });
+  }
+
   return (
     <main style={styles.main}>
       <div style={styles.header}>
@@ -54,7 +79,27 @@ export default async function DashboardPage() {
 
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>Recent Chats</h2>
-        <p style={{ color: "#94a3b8" }}>No conversations yet. Search a user to start chatting.</p>
+        {recentChats.length > 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {recentChats.map((chat) => (
+              <a
+                key={chat.id}
+                href={`/chat/${chat.id}`}
+                style={{
+                  padding: "10px",
+                  background: "#0f172a",
+                  borderRadius: "6px",
+                  color: "#f1f5f9",
+                  textDecoration: "none",
+                }}
+              >
+                @{chat.username}
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p style={{ color: "#94a3b8" }}>No conversations yet. Search a user to start chatting.</p>
+        )}
       </div>
 
       <div style={styles.section}>

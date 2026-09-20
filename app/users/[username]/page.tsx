@@ -1,5 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import MessageButton from "./message-button";
 
 export default async function UserProfilePage({
   params,
@@ -40,8 +41,10 @@ export default async function UserProfilePage({
 
         {!isOwnProfile && (
           <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
-            <button style={styles.button}>Message</button>
-            <button style={{ ...styles.button, background: "#8b5cf6" }}>Play Game</button>
+            <MessageButton targetUserId={profile.id} />
+            <button style={{ padding: "10px 20px", borderRadius: "6px", border: "none", background: "#8b5cf6", color: "white", cursor: "pointer", fontWeight: "bold" }}>
+              Play Game
+            </button>
           </div>
         )}
 
@@ -52,15 +55,3 @@ export default async function UserProfilePage({
     </main>
   );
 }
-
-const styles: { [key: string]: React.CSSProperties } = {
-  button: {
-    padding: "10px 20px",
-    borderRadius: "6px",
-    border: "none",
-    background: "#3b82f6",
-    color: "white",
-    cursor: "pointer",
-    fontWeight: "bold",
-  },
-};
