@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import LogoutButton from "./logout-button";
 import UserSearch from "./user-search";
+import InvitationsPanel from "./invitations-panel";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -61,6 +62,8 @@ export default async function DashboardPage() {
         <LogoutButton />
       </div>
 
+      <InvitationsPanel userId={user.id} />
+
       <div style={styles.statsRow}>
         <div style={styles.statCard}>
           <p style={styles.statNumber}>{totalUsers ?? 0}</p>
@@ -104,7 +107,7 @@ export default async function DashboardPage() {
 
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>Available Games</h2>
-        <p style={{ color: "#94a3b8" }}>Coming soon: Tic-Tac-Toe, Rock Paper Scissors, Connect Four, Memory Game</p>
+        <p style={{ color: "#94a3b8" }}>Tic-Tac-Toe, Rock Paper Scissors, Connect Four, Memory Game — invite a user from their profile to play.</p>
       </div>
     </main>
   );

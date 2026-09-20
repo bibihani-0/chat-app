@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import MessageButton from "./message-button";
+import GameInviteButton from "./game-invite-button";
 
 export default async function UserProfilePage({
   params,
@@ -42,9 +43,7 @@ export default async function UserProfilePage({
         {!isOwnProfile && (
           <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
             <MessageButton targetUserId={profile.id} />
-            <button style={{ padding: "10px 20px", borderRadius: "6px", border: "none", background: "#8b5cf6", color: "white", cursor: "pointer", fontWeight: "bold" }}>
-              Play Game
-            </button>
+            <GameInviteButton recipientId={profile.id} />
           </div>
         )}
 
